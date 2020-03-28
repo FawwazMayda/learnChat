@@ -26,6 +26,8 @@ class ChatViewController: UIViewController {
     }
     
     @IBAction func sendPressed(_ sender: UIButton) {
+        messages.append(Message(sender:"abang@bola.com",body: messageTextfield.text!))
+        tableView.reloadData()
     }
 }
 
