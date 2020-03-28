@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import  Firebase
 
 class LoginViewController: UIViewController {
 
@@ -15,7 +16,16 @@ class LoginViewController: UIViewController {
     
 
     @IBAction func loginPressed(_ sender: UIButton) {
-        performSegue(withIdentifier: Constants.loginSegue, sender: self)
+        if let email = emailTextfield.text,let pwd = passwordTextfield.text {
+            Auth.auth().signIn(withEmail: email, password: pwd) { (res, err) in
+                if err==nil {
+                    print("Sign In")
+                    self.performSegue(withIdentifier: Constants.loginSegue, sender: self)
+                } else {
+                    print("Not registered yet or Wrong credentials")
+                }
+            }
+        }
     }
     
 }

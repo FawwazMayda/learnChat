@@ -22,6 +22,7 @@ class ChatViewController: UIViewController {
         super.viewDidLoad()
         title = "Chat with A Ball"
         tableView.dataSource = self
+        tableView.delegate = self
 
     }
     
@@ -45,3 +46,12 @@ extension ChatViewController: UITableViewDataSource {
 }
 
 
+extension ChatViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        print(indexPath.row)
+    }
+    
+    func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+        print(indexPath.row)
+    }
+}
