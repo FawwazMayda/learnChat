@@ -7,11 +7,12 @@
 //
 
 import UIKit
-
+import Firebase
 class ChatViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var messageTextfield: UITextField!
+    let db = Firestore.firestore()
     
     var messages :[Message] = [
         Message(sender: "abang@bola.com", body: "Bola Oh Bola"),
@@ -23,12 +24,24 @@ class ChatViewController: UIViewController {
         title = "Chat with A Ball"
         tableView.dataSource = self
         tableView.delegate = self
-
+        tableView.register(UINib.init(nibName: "MessageCell", bundle: nil), forCellReuseIdentifier: Constants.cellIdentifier)
     }
     
     @IBAction func sendPressed(_ sender: UIButton) {
-        messages.append(Message(sender:"abang@bola.com",body: messageTextfield.text!))
-        tableView.reloadData()
+        //messages.append(Message(sender:"abang@bola.com",body: messageTextfield.text!))
+        //tableView.reloadData()
+        if let senderField = Auth.auth().currentUser?.email, let bodyField = messageTextfield.text {
+            db.collection(Constants.collectionsName).addDocument(data:
+                [Constants.dateField : Date().timeIntervalSince1970,
+                 Constants.senderField : senderField,
+                 Constants.bodyField : bodyField]) {err in
+                    if err==nil {
+                        print("Message Added")
+                    } else {
+                        print("Error adding message")
+                    }
+            }
+        }
     }
 }
 
@@ -39,8 +52,8 @@ extension ChatViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: Constants.cellIdentifier, for: indexPath)
-        cell.textLabel?.text = self.messages[indexPath.row].body
+        let cell = tableView.dequeueReusableCell(withIdentifier: Constants.cellIdentifier, for: indexPath) as! MessageCell
+        cell.message.text = messages[indexPath.row].body
         return cell
     }
 }

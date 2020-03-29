@@ -12,4 +12,8 @@ struct Constants {
     static let registerSegue = "RegisterToChat"
     static let loginSegue = "LoginToChat"
     static let cellIdentifier = "ReusableCell"
+    static let senderField = "sender"
+    static let bodyField = "body"
+    static let dateField = "date"
+    static let collectionsName = "messageCollections"
 }
