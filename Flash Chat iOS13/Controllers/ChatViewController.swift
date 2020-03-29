@@ -21,6 +21,7 @@ class ChatViewController: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(UINib.init(nibName: "MessageCell", bundle: nil), forCellReuseIdentifier: Constants.cellIdentifier)
+        
         loadMessages()
     }
     
