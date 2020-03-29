@@ -14,17 +14,37 @@ class ChatViewController: UIViewController {
     @IBOutlet weak var messageTextfield: UITextField!
     let db = Firestore.firestore()
     
-    var messages :[Message] = [
-        Message(sender: "abang@bola.com", body: "Bola Oh Bola"),
-        Message(sender: "abang@kotak.com", body: "Kotak Oh Kotak"),
-        Message(sender: "abang@bola.com", body: "Oh Bukan Bola")
-    ]
+    var messages :[Message] = []
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Chat with A Ball"
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(UINib.init(nibName: "MessageCell", bundle: nil), forCellReuseIdentifier: Constants.cellIdentifier)
+        loadMessages()
+    }
+    
+    
+    func loadMessages() {
+        db.collection(Constants.collectionsName).order(by: Constants.dateField).addSnapshotListener { (snapshot, error) in
+            if error==nil {
+                self.messages = []
+                if let snapsDoc = snapshot?.documents {
+                    for doc in snapsDoc {
+                        let d = doc.data()
+                        if let sender = d[Constants.senderField] as? String, let body = d[Constants.bodyField] as? String {
+                            let newMessage = Message(sender: sender, body: body)
+                            self.messages.append(newMessage)
+                            DispatchQueue.main.async {
+                                self.tableView.reloadData()
+                            }
+                        }
+                    }
+                }
+            } else {
+                print("Error retrieving data")
+            }
+        }
     }
     
     @IBAction func sendPressed(_ sender: UIButton) {
@@ -54,6 +74,15 @@ extension ChatViewController: UITableViewDataSource {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: Constants.cellIdentifier, for: indexPath) as! MessageCell
         cell.message.text = messages[indexPath.row].body
+        cell.meProfileImage.isHidden = false
+        cell.youProfileImage.isHidden = false
+        if let currentUser = Auth.auth().currentUser?.email {
+            if  currentUser==messages[indexPath.row].sender {
+                cell.youProfileImage.isHidden = true
+            } else {
+                cell.meProfileImage.isHidden = true
+            }
+        }
         return cell
     }
 }
